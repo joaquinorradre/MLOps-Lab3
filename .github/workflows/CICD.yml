@@ -19,10 +19,41 @@ jobs:
         run: make lint
       - name: test
         run: make test
+  
+  check-artifacts:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Check required files exist
+        run: |
+          echo "Checking for required model artifacts..."
+          
+          if [ ! -f "pet_classifier_model.onnx" ]; then
+            echo "ERROR: pet_classifier_model.onnx not found!"
+            exit 1
+          fi
+          echo "pet_classifier_model.onnx found"
+          
+          if [ ! -f "pet_classifier_model.onnx.data" ]; then
+            echo "ERROR: pet_classifier_model.onnx.data not found!"
+            exit 1
+          fi
+          echo "pet_classifier_model.onnx.data found"
+          
+          if [ ! -f "class_labels.json" ]; then
+            echo "ERROR: class_labels.json not found!"
+            exit 1
+          fi
+          echo "class_labels.json found"
+          
+          echo "All required artifacts present"
         
   deploy:
     runs-on: ubuntu-latest
-    needs: build   # it is not executed if build fails
+    needs: [build, check-artifacts]   # it is not executed if build and check-artifacts fail
     env:
       DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/mlops-lab3:latest
     steps:
