@@ -211,11 +211,11 @@ def main(run_args):
 
 class Args:
     def __init__(self, dictionary):
-        self.run_name = None  # Inicializar atributos que se pueden agregar después
+        self.run_name = None
         for k, v in dictionary.items():
             setattr(self, k, v)
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_name", type=str, default="mobilenet_v2")
     parser.add_argument("--epochs", type=int, default=5)
