@@ -65,4 +65,4 @@ jobs:
           cache-to: type=gha,mode=max
           
       - name: Trigger Render Deploy
-        run: curl -X POST "https://api.render. com/deploy/srv-d4lj42uuk2gs738ekaeg?key=${{ secrets.RENDER_DEPLOY_HOOK_KEY }}"
+        run: curl -X POST "https://api.render.com/deploy/srv-d4lj42uuk2gs738ekaeg?key=${{ secrets.RENDER_DEPLOY_HOOK_KEY }}"
