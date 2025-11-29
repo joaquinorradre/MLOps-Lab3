@@ -48,12 +48,12 @@ class PetClassifier:
         
         self.input_name = self.session.get_inputs()[0].name
         
-        with open(labels_path, 'r') as f:
+        with open(labels_path, 'r', encoding='utf-8') as f:
             self.class_labels = json.load(f)
         
-        print(f"✓ Model loaded successfully")
-        print(f"✓ Input name: {self.input_name}")
-        print(f"✓ Number of classes: {len(self.class_labels)}")
+        print("Model loaded successfully")
+        print(f"Input name: {self.input_name}")
+        print(f"Number of classes: {len(self.class_labels)}")
     
     def preprocess(self, image_bytes: bytes) -> np.ndarray:
         """

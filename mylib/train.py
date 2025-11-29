@@ -48,8 +48,8 @@ def prepare_data(data_dir="data", batch_size=32, seed=42):
 
     return train_loader, val_loader, idx_to_class, len(class_to_idx)
 
-def build_model(model_name, num_classes, learning_rate=0.001):
-    if model_name == "mobilenet_v2":
+def build_model(model_arch, num_classes, learning_rate=0.001):
+    if model_arch == "mobilenet_v2":
         model = models.mobilenet_v2(weights="IMAGENET1K_V1")
         for param in model.features.parameters():
             param.requires_grad = False
@@ -57,7 +57,7 @@ def build_model(model_name, num_classes, learning_rate=0.001):
         model.classifier[1] = nn.Linear(in_features, num_classes)
         params_to_update = model.classifier.parameters()
 
-    elif model_name == "efficientnet_b0":
+    elif model_arch == "efficientnet_b0":
         model = models.efficientnet_b0(weights="IMAGENET1K_V1")
         for param in model.features.parameters():
             param.requires_grad = False
@@ -65,7 +65,7 @@ def build_model(model_name, num_classes, learning_rate=0.001):
         model.classifier[1] = nn.Linear(in_features, num_classes)
         params_to_update = model.classifier.parameters()
 
-    elif model_name == "resnet18":
+    elif model_arch == "resnet18":
         model = models.resnet18(weights="IMAGENET1K_V1")
         for param in model.parameters():
             param.requires_grad = False
@@ -73,7 +73,7 @@ def build_model(model_name, num_classes, learning_rate=0.001):
         model.fc = nn.Linear(in_features, num_classes)
         params_to_update = model.fc.parameters()
     else:
-        raise ValueError(f"Model {model_name} not supported.")
+        raise ValueError(f"Model {model_arch} not supported.")
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(params_to_update, lr=learning_rate)
@@ -159,8 +159,8 @@ def plot_metrics(history, filename="loss_curve.png"):
     plt.savefig(filename)
     plt.close()
 
-def main(args):
-    set_seed(args.seed)
+def main(run_args):
+    set_seed(run_args.seed)
 
     if torch.cuda.is_available():
         device = torch.device("cuda")
@@ -168,38 +168,39 @@ def main(args):
         device = torch.device("cpu")
 
     mlflow.set_experiment("Lab3_DeepLearning")
-    run_name = args.run_name if hasattr(args, "run_name") else f"{args.model_name}_BS{args.batch_size}_LR{args.learning_rate}"
+    run_name = (run_args.run_name if hasattr(run_args, "run_name") 
+                else f"{run_args.model_name}_BS{run_args.batch_size}_LR{run_args.learning_rate}")
 
     with mlflow.start_run(run_name=run_name):
         params = {
-            "model_name": args.model_name,
+            "model_name": run_args.model_name,
             "weights": "IMAGENET1K_V1",
-            "epochs": args.epochs,
-            "batch_size": args.batch_size,
-            "learning_rate": args.learning_rate,
-            "seed": args.seed,
+            "epochs": run_args.epochs,
+            "batch_size": run_args.batch_size,
+            "learning_rate": run_args.learning_rate,
+            "seed": run_args.seed,
             "dataset": "OxfordIIITPet"
         }
         mlflow.log_params(params)
 
         train_loader, val_loader, idx_to_class, num_classes = prepare_data(
-            batch_size=args.batch_size, seed=args.seed
+            batch_size=run_args.batch_size, seed=run_args.seed
         )
 
-        with open("class_labels.json", "w") as f:
+        with open("class_labels.json", "w", encoding="utf-8") as f:
             json.dump(idx_to_class, f)
         mlflow.log_artifact("class_labels.json")
 
         model, criterion, optimizer = build_model(
-            model_name=args.model_name,
+            model_arch=run_args.model_name,
             num_classes=num_classes,
-            learning_rate=args.learning_rate
+            learning_rate=run_args.learning_rate
         )
 
         model, history = train_model(
             model, criterion, optimizer,
             train_loader, val_loader,
-            device, epochs=args.epochs
+            device, epochs=run_args.epochs
         )
 
         plot_filename = "loss_curves.png"
@@ -210,6 +211,7 @@ def main(args):
 
 class Args:
     def __init__(self, dictionary):
+        self.run_name = None  # Inicializar atributos que se pueden agregar después
         for k, v in dictionary.items():
             setattr(self, k, v)
 
@@ -245,10 +247,9 @@ if __name__ == "__main__":
                 current_args = Args(exp_config)
                 current_args.run_name = f"{model_name}_BS{config['batch_size']}_LR{config['learning_rate']}_exp{experiment_counter}"
                 print(f"\n{'='*60}")
-                print(f"Running experiment {experiment_counter + 1}/9: {current_args.run_name}")
+                print(f"Running experiment {experiment_counter + 1}/12: {current_args.run_name}")
                 print(f"{'='*60}\n")
                 main(current_args)
                 experiment_counter += 1
     else:
         main(args)
-

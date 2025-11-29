@@ -4,7 +4,6 @@ logic.py
 Logic for image processing and prediction.
 """
 
-import random
 import io
 from PIL import Image, ImageOps
 from mylib.classifier import PetClassifier
@@ -12,8 +11,11 @@ from mylib.classifier import PetClassifier
 try:
     _classifier = PetClassifier()
     print("Classifier initialized successfully in logic module")
-except Exception as e:
+except (FileNotFoundError, OSError, ValueError) as e:
     print(f"Warning: Could not load classifier: {e}")
+    _classifier = None
+except ImportError as e:
+    print(f"Warning: Missing dependencies: {e}")
     _classifier = None
 
 def predict(image_bytes: bytes) -> str:

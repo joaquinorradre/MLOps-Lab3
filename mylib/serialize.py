@@ -3,7 +3,6 @@ import mlflow.pytorch
 from mlflow.tracking import MlflowClient
 import torch
 import json
-import os
 
 def get_best_model(model_name="PetClassifier", metric_name="final_val_accuracy"):
     """
@@ -46,7 +45,7 @@ def get_best_model(model_name="PetClassifier", metric_name="final_val_accuracy")
             best_version = version
     
     print("-" * 80)
-    print(f"\n✓ Best model selected:")
+    print("\nBest model selected:")
     print(f"  - Version: {best_version.version}")
     print(f"  - Run ID: {best_version.run_id}")
     print(f"  - {metric_name}: {best_metric_value:.4f}")
@@ -57,7 +56,7 @@ def load_and_prepare_model(best_version):
     """
     Load the best model and prepare it for production (CPU + eval mode).
     """
-    print(f"\nLoading model from MLflow...")
+    print("\nLoading model from MLflow...")
     model_uri = f"runs:/{best_version.run_id}/model"
     model = mlflow.pytorch.load_model(model_uri)
     
@@ -73,7 +72,7 @@ def export_to_onnx(model, output_path="model.onnx", input_size=(1, 3, 224, 224))
     """
     Export the model to ONNX format.
     """
-    print(f"\nExporting model to ONNX format...")
+    print("\nExporting model to ONNX format...")
     
     dummy_input = torch.randn(input_size)
     
@@ -97,7 +96,7 @@ def save_class_labels(best_version, output_path="class_labels.json"):
     """
     Download and save the class labels of the best model.
     """
-    print(f"\nDownloading class labels...")
+    print("\nDownloading class labels...")
     client = MlflowClient()
     
     artifact_path = client.download_artifacts(
@@ -107,10 +106,10 @@ def save_class_labels(best_version, output_path="class_labels.json"):
     
     print(f"Artifact downloaded at: {artifact_path}")
     
-    with open(artifact_path, 'r') as f:
+    with open(artifact_path, 'r', encoding='utf-8') as f:
         class_labels = json.load(f)
     
-    with open(output_path, 'w') as f:
+    with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(class_labels, f, indent=2)
     
     print(f"✓ Class labels saved to: {output_path}")
@@ -143,16 +142,16 @@ def main():
         "num_classes": len(class_labels)
     }
     
-    with open("model_info.json", 'w') as f:
+    with open("model_info.json", 'w', encoding='utf-8') as f:
         json.dump(model_info, f, indent=2)
     
     print("\n" + "=" * 80)
     print("✓ PROCESS COMPLETED")
     print("=" * 80)
-    print(f"Generated files:")
+    print("Generated files:")
     print(f"  1. {onnx_path} - Model serialized in ONNX format")
-    print(f"  2. class_labels.json - Class labels")
-    print(f"  3. model_info.json - Selected model information")
+    print("  2. class_labels.json - Class labels")
+    print("  3. model_info.json - Selected model information")
     print("=" * 80)
 
 if __name__ == "__main__":
