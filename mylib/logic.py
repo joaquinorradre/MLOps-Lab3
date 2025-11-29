@@ -7,15 +7,24 @@ Logic for image processing and prediction.
 import random
 import io
 from PIL import Image, ImageOps
+from mylib.classifier import PetClassifier
 
+try:
+    _classifier = PetClassifier()
+    print("Classifier initialized successfully in logic module")
+except Exception as e:
+    print(f"Warning: Could not load classifier: {e}")
+    _classifier = None
 
-def predict(_image_bytes: bytes) -> str:
+def predict(image_bytes: bytes) -> str:
     """
-    Predict the class of an image.
-    In this lab, it just returns a random class. [cite: 10]
+    Predict the class of an image using the trained ONNX model.
+
     """
-    class_names = ["cat", "dog", "bird", "snake", "bear"]
-    return random.choice(class_names)
+    if _classifier is None:
+        return "Error: Model not loaded"
+    
+    return _classifier.predict(image_bytes)
 
 def resize(image_bytes: bytes, width: int, height: int) -> bytes:
     """
