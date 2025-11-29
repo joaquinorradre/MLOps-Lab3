@@ -44,6 +44,10 @@ def get_best_model(model_name="PetClassifier", metric_name="final_val_accuracy")
             best_metric_value = metric_value
             best_version = version
     
+    if best_version is None:
+        best_version = model_versions[0]
+        print("\nWarning: No valid metrics found, selecting first available version")
+
     print("-" * 80)
     print("\nBest model selected:")
     print(f"  - Version: {best_version.version}")
@@ -154,5 +158,5 @@ def main():
     print("  3. model_info.json - Selected model information")
     print("=" * 80)
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
