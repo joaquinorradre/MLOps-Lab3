@@ -35,9 +35,9 @@ COPY api ./api
 COPY mylib ./mylib
 COPY templates ./templates
 # Copy the model and the class labels
-COPY pet_classifier_model.onnx ./pet_classifier_model.onnx
-COPY pet_classifier_model.onnx.data ./pet_classifier_model.onnx.data
-COPY class_labels.json ./class_labels.json
+COPY models/pet_classifier_model.onnx ./models/pet_classifier_model.onnx
+COPY models/pet_classifier_model.onnx.data ./models/pet_classifier_model.onnx.data
+COPY models/class_labels.json ./models/class_labels.json
 # Expose the port associated with the API created with FastAPI
 EXPOSE 8000
 # Default command: it starts the API with uvicorn

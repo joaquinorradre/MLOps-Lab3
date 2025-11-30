@@ -31,29 +31,39 @@ jobs:
         run: |
           echo "Checking for required model artifacts..."
           
-          if [ ! -f "pet_classifier_model.onnx" ]; then
-            echo "ERROR: pet_classifier_model.onnx not found!"
+          # Check models directory exists
+          if [ ! -d "models" ]; then
+            echo "ERROR: models directory not found!"
             exit 1
           fi
-          echo "pet_classifier_model.onnx found"
+          echo "models directory found"
           
-          if [ ! -f "pet_classifier_model.onnx.data" ]; then
-            echo "ERROR: pet_classifier_model.onnx.data not found!"
+          # Check ONNX model file
+          if [ ! -f "models/pet_classifier_model.onnx" ]; then
+            echo "ERROR: models/pet_classifier_model.onnx not found!"
             exit 1
           fi
-          echo "pet_classifier_model.onnx.data found"
+          echo "models/pet_classifier_model.onnx found"
           
-          if [ ! -f "class_labels.json" ]; then
-            echo "ERROR: class_labels.json not found!"
+          # Check ONNX data file
+          if [ ! -f "models/pet_classifier_model.onnx.data" ]; then
+            echo "ERROR: models/pet_classifier_model.onnx.data not found!"
             exit 1
           fi
-          echo "class_labels.json found"
+          echo "models/pet_classifier_model.onnx.data found"
           
-          echo "All required artifacts present"
+          # Check class labels
+          if [ ! -f "models/class_labels.json" ]; then
+            echo "ERROR: models/class_labels.json not found!"
+            exit 1
+          fi
+          echo "models/class_labels.json found"
+          
+          echo "All required artifacts present in models/ directory"
         
   deploy:
     runs-on: ubuntu-latest
-    needs: [build, check-artifacts]   # it is not executed if build and check-artifacts fail
+    needs: [build, check-artifacts]
     env:
       DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/mlops-lab3:latest
     steps:
@@ -90,7 +100,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env. DOCKER_IMAGE }}
+          tags: ${{ env.DOCKER_IMAGE }}
           file: ./Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -99,25 +109,25 @@ jobs:
         run: curl -X POST "https://api.render.com/deploy/srv-d4lj42uuk2gs738ekaeg?key=${{ secrets.RENDER_DEPLOY_HOOK_KEY }}"
         
   deploy-hf:
-        runs-on: ubuntu-latest
-        needs: deploy   # it is not executed if deploy fails
-        steps:
-          - name: Checkout repository with all branches
-            uses: actions/checkout@v4
-            with:
-              fetch-depth: 0  # needed to access other branches (hf-space)
-              ref: main
-          
-          - name: Switch to hf-space branch
-            run: |
-              git fetch origin hf-space
-              git checkout hf-space
-          
-          - name: Add Hugging Face remote
-            env:
-              HF_TOKEN: ${{ secrets.HF_TOKEN }}
-              HF_USERNAME: ${{ secrets.HF_USERNAME }}
-            run: git remote add huggingface https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/spaces/${HF_USERNAME}/mlops-lab3.git
-    
-          - name: Push hf-space branch to Hugging Face
-            run: git push huggingface hf-space:main --force
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Checkout repository with all branches
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+      
+      - name: Switch to hf-space branch
+        run: |
+          git fetch origin hf-space
+          git checkout hf-space
+      
+      - name: Add Hugging Face remote
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_USERNAME: ${{ secrets.HF_USERNAME }}
+        run: git remote add huggingface https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/spaces/${HF_USERNAME}/mlops-lab3.git
+
+      - name: Push hf-space branch to Hugging Face
+        run: git push huggingface hf-space:main --force
