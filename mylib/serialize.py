@@ -3,6 +3,7 @@ import mlflow.pytorch
 from mlflow.tracking import MlflowClient
 import torch
 import json
+import os
 
 def get_best_model(model_name="PetClassifier", metric_name="final_val_accuracy"):
     """
@@ -72,11 +73,14 @@ def load_and_prepare_model(best_version):
     
     return model
 
-def export_to_onnx(model, output_path="model.onnx", input_size=(1, 3, 224, 224)):
+def export_to_onnx(model, output_path="models/pet_classifier_model.onnx", 
+                   input_size=(1, 3, 224, 224)):
     """
     Export the model to ONNX format.
     """
     print("\nExporting model to ONNX format...")
+    
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     
     dummy_input = torch.randn(input_size)
     
@@ -96,12 +100,14 @@ def export_to_onnx(model, output_path="model.onnx", input_size=(1, 3, 224, 224))
     print(f"✓ Model exported to: {output_path}")
     return output_path
 
-def save_class_labels(best_version, output_path="class_labels.json"):
+def save_class_labels(best_version, output_path="models/class_labels.json"):
     """
     Download and save the class labels of the best model.
     """
     print("\nDownloading class labels...")
     client = MlflowClient()
+    
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     
     artifact_path = client.download_artifacts(
         run_id=best_version.run_id,
@@ -126,6 +132,8 @@ def main():
     print("SELECTION AND SERIALIZATION OF THE BEST MODEL")
     print("=" * 80)
     
+    os.makedirs("models", exist_ok=True)
+    
     best_version, best_accuracy = get_best_model(
         model_name="PetClassifier",
         metric_name="final_val_accuracy"
@@ -133,20 +141,26 @@ def main():
     
     model = load_and_prepare_model(best_version)
     
-    onnx_path = export_to_onnx(model, output_path="pet_classifier_model.onnx")
+    onnx_path = export_to_onnx(
+        model, 
+        output_path="models/pet_classifier_model.onnx"
+    )
     
-    class_labels = save_class_labels(best_version, output_path="class_labels.json")
+    class_labels = save_class_labels(
+        best_version, 
+        output_path="models/class_labels.json"
+    )
     
     model_info = {
         "model_version": best_version.version,
         "run_id": best_version.run_id,
         "validation_accuracy": best_accuracy,
         "onnx_model_path": onnx_path,
-        "class_labels_path": "class_labels.json",
+        "class_labels_path": "models/class_labels.json",
         "num_classes": len(class_labels)
     }
     
-    with open("model_info.json", 'w', encoding='utf-8') as f:
+    with open("models/model_info.json", 'w', encoding='utf-8') as f:
         json.dump(model_info, f, indent=2)
     
     print("\n" + "=" * 80)
@@ -154,8 +168,8 @@ def main():
     print("=" * 80)
     print("Generated files:")
     print(f"  1. {onnx_path} - Model serialized in ONNX format")
-    print("  2. class_labels.json - Class labels")
-    print("  3. model_info.json - Selected model information")
+    print("  2. models/class_labels.json - Class labels")
+    print("  3. models/model_info.json - Selected model information")
     print("=" * 80)
 
 if __name__ == "__main__":  # pragma: no cover

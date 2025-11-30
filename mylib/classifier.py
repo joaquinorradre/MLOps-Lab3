@@ -26,12 +26,12 @@ class PetClassifier:
         if model_path is None:
             current_dir = os.path.dirname(os.path.abspath(__file__))
             project_root = os.path.dirname(current_dir)
-            model_path = os.path.join(project_root, "pet_classifier_model.onnx")
+            model_path = os.path.join(project_root, "models", "pet_classifier_model.onnx")
         
         if labels_path is None:
             current_dir = os.path.dirname(os.path.abspath(__file__))
             project_root = os.path.dirname(current_dir)
-            labels_path = os.path.join(project_root, "class_labels.json")
+            labels_path = os.path.join(project_root, "models", "class_labels.json")
         
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model file not found: {model_path}")
