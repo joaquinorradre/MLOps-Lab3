@@ -104,5 +104,5 @@ async def grayscale_endpoint(file: UploadFile = File(...)):
                             detail=f"Error converting image to grayscale: {e}") from e
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     uvicorn.run("api.api:app", host="0.0.0.0", port=8000, reload=True) # pragma: no cover

@@ -10,12 +10,12 @@ from mylib.classifier import PetClassifier
 
 try: #pragma: no cover
     _classifier = PetClassifier()
-    print("Classifier initialized successfully in logic module")
+    print("Classifier initialized successfully in logic module") # pragma: no cover
 except (FileNotFoundError, OSError, ValueError) as e: # pragma: no cover
-    print(f"Warning: Could not load classifier: {e}")
+    print(f"Warning: Could not load classifier: {e}") # pragma: no cover
     _classifier = None
 except ImportError as e:  #pragma: no cover
-    print(f"Warning: Missing dependencies: {e}")
+    print(f"Warning: Missing dependencies: {e}") # pragma: no cover
     _classifier = None
 
 def predict(image_bytes: bytes) -> str:
