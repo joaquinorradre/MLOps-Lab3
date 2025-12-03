@@ -1,24 +1,24 @@
-[![CICD](https://github.com/joaquinorradre/MLOps-Lab2/actions/workflows/CICD.yml/badge.svg)](https://github.com/joaquinorradre/MLOps-Lab2/actions/workflows/CICD.yml)
+[![CICD](https://github.com/joaquinorradre/MLOps-Lab3/actions/workflows/CICD.yml/badge.svg)](https://github.com/joaquinorradre/MLOps-Lab2/actions/workflows/CICD.yml)
 
-# MLOps Lab 2 - Image Processing API
+# MLOps Lab 3 - End-to-End Deep Learning Pipeline
 
-[![API on Render](https://img.shields.io/badge/Render-API-blue)](https://mlops-lab2-latest.onrender.com)
-[![HuggingFace Space](https://img.shields.io/badge/HuggingFace-Frontend-purple)](https://huggingface.co/spaces/joaquinorradre/mlops)
+[![API on Render](https://img.shields.io/badge/Render-API-blue)](https://mlops-lab3-latest.onrender.com)
+[![HuggingFace Space](https://img.shields.io/badge/HuggingFace-Frontend-purple)](https://huggingface.co/spaces/joaquinorradre/mlops-lab3)
 
 
 ## Overview
-This project provides an Image Processing API built with FastAPI. It allows users to perform various operations on images, such as classification, resizing, and grayscale conversion.
+This project represents a complete **MLOps lifecycle** for a Deep Learning application. It evolves from a simple image processing API into a robust production system capable of classifying pet breeds using **Transfer Learning**.
 
-To facilitate interaction, a Gradio interface has been developed as a frontend. This frontend is deployed on HuggingFace Spaces and communicates with the backend API, which is hosted on Render.
+The system is built on a decoupled architecture: a **FastAPI** backend (for inference and processing) hosted on Render, and a **Gradio** frontend hosted on HuggingFace Spaces.
 
 ### Key Capabilities
-- **Predict**: Identify image classes using a pre-trained model.
+- **Predict**: Identifies the breed of a cat or dog from an image using the trained MobileNetV2 (ONNX) model.
 - **Resize**: Adjust images to custom width and height dimensions.
 - **Grayscale**: Convert color images to grayscale.
 
 ## 🚀 Live Demo
-- **Backend API (Swagger UI)**: [Render API](https://mlops-lab2-latest.onrender.com/docs)
-- **Frontend Interface (Gradio)**: [HuggingFace Space](https://huggingface.co/spaces/joaquinorradre/mlops)
+- **Backend API (Swagger UI)**: [Render API](https://mlops-lab3-latest.onrender.com/docs)
+- **Frontend Interface (Gradio)**: [HuggingFace Space](https://huggingface.co/spaces/joaquinorradre/mlops-lab3)
 
 ## ✨ Features
 
@@ -41,7 +41,7 @@ This project follows a decoupled architecture:
 ### Render (API):
 - The FastAPI application is dockerized and deployed here.
 - It handles all the heavy lifting (image processing logic).
-- Public URL: [https://mlops-lab2-latest.onrender.com](https://mlops-lab2-latest.onrender.com)
+- Public URL: [https://mlops-lab2-latest.onrender.com](https://mlops-lab3-latest.onrender.com)
 
 ### HuggingFace Space (Frontend):
 - Contains the `app.py` (Gradio) application.
