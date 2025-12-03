@@ -30,14 +30,14 @@ RUN uv pip install --system --no-cache .
 FROM base AS runtime
 # Copy the installed dependencies
 COPY --from=builder /usr/local /usr/local
-# Copy the source code of the API, logic and home.html
-COPY api ./api
-COPY mylib ./mylib
-COPY templates ./templates
 # Copy the model and the class labels
 COPY models/pet_classifier_model.onnx ./models/pet_classifier_model.onnx
 COPY models/pet_classifier_model.onnx.data ./models/pet_classifier_model.onnx.data
 COPY models/class_labels.json ./models/class_labels.json
+# Copy the source code of the API, logic and home.html
+COPY api ./api
+COPY mylib ./mylib
+COPY templates ./templates
 # Expose the port associated with the API created with FastAPI
 EXPOSE 8000
 # Default command: it starts the API with uvicorn
