@@ -11,7 +11,7 @@ from mylib.classifier import PetClassifier
 try: #pragma: no cover
     _classifier = PetClassifier()
     print("Classifier initialized successfully in logic module")
-except (FileNotFoundError, OSError, ValueError) as e:
+except (FileNotFoundError, OSError, ValueError) as e: # pragma: no cover
     print(f"Warning: Could not load classifier: {e}")
     _classifier = None
 except ImportError as e:  #pragma: no cover
