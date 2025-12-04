@@ -43,18 +43,27 @@ def test_predict_handles_missing_model():
     """
     Test that predict handles gracefully when model is not loaded.
     
-    This test only passes if the model failed to load during import.
+    We force the classifier to be None to ensure this path is tested
+    regardless of whether the model loaded successfully or not.
     """
-    if logic._classifier is None:
+    original_classifier = logic._classifier
+    
+    logic._classifier = None
+    
+    try:
         img = Image.new("RGB", (224, 224), color="blue")
         byte_io = io.BytesIO()
         img.save(byte_io, format="PNG")
         image_bytes = byte_io.getvalue()
         
         prediction = logic.predict(image_bytes)
+        
         assert prediction == "Error: Model not loaded", (
             "Should return error message when model is not loaded"
         )
+        
+    finally:
+        logic._classifier = original_classifier
 
 def test_predict_calls_classifier():
     """
